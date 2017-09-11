@@ -1,0 +1,22 @@
+body {
+    font-family: 
+}
+.header {
+    background-color: black; 
+    color: #00ccff; 
+    font-size: 25px;
+}
+.container {
+    border: 1px solid black;
+    margin: 5px auto;
+    border: 2px solid #00ccff;
+    font-size: 20px;
+}
+.footer {
+    position: relative;
+    float: left;
+    bottom: 100%;
+    background-color: black; 
+    color: #00ccff; 
+    font-size: 25px;
+}
