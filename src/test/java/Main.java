@@ -2,16 +2,17 @@ import com.mongodb.*;
 
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoCollection;
-
+import com.mongodb.client.result.DeleteResult;
+import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
 import java.util.Arrays;
-
 import com.mongodb.client.MongoCursor;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.*;
+import static com.mongodb.client.model.Updates.inc;
 
 public class Main {
     public static void main(String[] args ){
@@ -21,11 +22,16 @@ public class Main {
         MongoCollection <Document> collection = database.getCollection("test");
 
 //        printFirst(collection);
-        collectionCount(collection);
+//        collectionCount(collection);
 //        printAll(collection);
 //        printFirstOrLast(collection, 1);
-        findByStringAndInt(collection, "i", 30);
-
+//        findByStringAndInt(collection, "i", 30);
+//        findByRange(collection, "i", 10, 14);
+//        updateOneByField(collection, "i", 10, 1234);
+//        updateManyByField(collection, "i", 0, 1);
+//        incrementManybyField(collection, "i", 1, -100);
+        deleteOneByField(collection, "i", 42);
+        deleteManyByField(collection, "i", -99);
     }
 
     private void documentCreation(MongoCollection <Document> collection) {
@@ -82,5 +88,39 @@ public class Main {
 
         Document document = collection.find(eq(str, i)).first();
         System.out.println(document.toJson());
+    }
+    private static void findByRange (MongoCollection <Document> collection, String fieldName, int from, int to) {
+
+        Block <Document> printBlock = new Block <Document>() {
+            public void apply (final Document document) {
+
+                System.out.println(document.toJson());
+            }
+        };
+
+        collection.find(and(gte(fieldName, from), lte(fieldName, to))).forEach(printBlock);
+    }
+    private static void updateOneByField (MongoCollection <Document> collection, String fieldName, int value, int newValue) {
+        collection.updateOne(eq(fieldName, value), new Document("$set", new Document(fieldName, newValue)));
+    }
+    private static void incrementManybyField (MongoCollection <Document> collection, String fieldName, int value, int newValue) {
+
+        UpdateResult updateResult = collection.updateMany(eq(fieldName, value), inc(fieldName, (Number)newValue));
+        System.out.println(updateResult.getModifiedCount());
+    }
+    private static void updateManyByField (MongoCollection <Document> collection, String fieldName, int value, int newValue) {
+
+        UpdateResult updateResult = collection.updateMany(eq(fieldName, value), new Document("$set", new Document(fieldName, newValue)));
+        System.out.println(updateResult.getModifiedCount());
+    }
+    private static void deleteOneByField (MongoCollection <Document> collection, String fieldName, int eqValue) {
+
+        DeleteResult deleteResult = collection.deleteOne(eq(fieldName, eqValue));
+        System.out.println("deleted" + deleteResult.getDeletedCount());
+    }
+    private static void deleteManyByField (MongoCollection <Document> collection, String fieldName, int eqValue) {
+
+        DeleteResult deleteResult = collection.deleteMany(eq(fieldName, eqValue));
+        System.out.println("deleted" + deleteResult.getDeletedCount());
     }
 }
